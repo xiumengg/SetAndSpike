@@ -100,11 +100,11 @@ void ASetAndSpikeCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	CalculateTossLocation();
-
-	DrawTossLocation();
-
-	DrawSetTrajectory();
+	if(bAdvanceSetting)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ASDASDASDASDASDASD"));
+		AdvanceSetting();
+	}
 	
 	
 	
@@ -114,6 +114,8 @@ void ASetAndSpikeCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	bAdvanceSetting = true;
+	
 	if(PracticePartner)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ASDas"));
@@ -364,6 +366,14 @@ void ASetAndSpikeCharacter::RotateTossLocation(float DeltaSeconds, float Rate)
 	
 }
 
+void ASetAndSpikeCharacter::AdvanceSetting()
+{
+	CalculateTossLocation();
+
+	DrawTossLocation();
+
+	DrawSetTrajectory();
+}
 
 
 void ASetAndSpikeCharacter::TestMouseY(float Rate)
