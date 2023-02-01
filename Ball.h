@@ -34,6 +34,7 @@ public:
 
 	void SetForSpike(ACharacter* Targeted);
 
+	void TimeTillFloor(FVector TossVelocity);
 
 private:
 

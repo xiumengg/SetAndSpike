@@ -433,18 +433,6 @@ void ASetAndSpikeCharacter::TestMouseY(float Rate)
 
 void ASetAndSpikeCharacter::RotateSetTrajectory(float Rate)
 {
-	// CurrAngle += Rate;
-	//
-	// if(CurrAngle > 360.f)
-	// {
-	// 	CurrAngle = 1.f;
-	// }
-	//
-	// if(CurrAngle < 0.f)
-	// {
-	// 	CurrAngle = 360.f;
-	// }
-	//
 
 	
 	float DeltaTime = UGameplayStatics::GetWorldDeltaSeconds(this);

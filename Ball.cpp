@@ -34,60 +34,66 @@ void ABall::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	FVector TossVelocity;
-
-	// UGameplayStatics::BlueprintSuggestProjectileVelocity(
+	// FHitResult HitResult;
+	// TArray<FVector> OutPathPositions;
+	// FVector LastTraceDestination;
+	// const TArray<AActor*> ActorsToIgnore;
+	//
+	// UGameplayStatics::Blueprint_PredictProjectilePath_ByTraceChannel(
 	// 	this,
-	// 	TossVelocity,
+	// 	HitResult,
+	// 	OutPathPositions,
+	// 	LastTraceDestination,
 	// 	GetActorLocation(),
-	// 	BallTarget->GetActorLocation(),
-	// 	0,
-	// 	0,
-	// 	ESuggestProjVelocityTraceOption::TraceFullPath,
-	// 	10.f,
+	// 	GetVelocity(),
 	// 	true,
-	// 	true
+	// 	10,
+	// 	ECollisionChannel::ECC_WorldDynamic,
+	// 	true,
+	// 	ActorsToIgnore,
+	// 	EDrawDebugTrace::ForOneFrame,
+	// 	1
+	// 	);
+
+	// FPredictProjectilePathParams PathParams = FPredictProjectilePathParams {
+	// 	10,
+	// 	GetActorLocation(),
+	// 	GetVelocity(),
+	// 	2,
+	// };
+	//
+	// TArray<AActor*> ActorsToIgnore;
+	//
+	// ActorsToIgnore.Add(this);
+	//
+	// PathParams.bTraceWithCollision = true;
+	// PathParams.TraceChannel = ECC_Camera;
+	// PathParams.ActorsToIgnore = ActorsToIgnore;
+	//
+	//
+	// FPredictProjectilePathResult PathResult;
+	//
+	//
+	// UGameplayStatics::Blueprint_PredictProjectilePath_Advanced(this, PathParams, PathResult);
+	//
+	// FVector FloorEnd = PathResult.PathData.Last(0).Location;
+	//
+	// DrawDebugSphere(
+	// 	GetWorld(),
+	// 	FloorEnd,
+	// 	50,
+	// 	1,
+	// 	FColor::Cyan,
+	// 	false
 	// );
 	//
-	// UGameplayStatics::SuggestProjectileVelocity_CustomArc(
-	// 	this,
-	// 	TossVelocity,
-	// 	GetActorLocation(),
-	// 	BallTarget->GetActorLocation()
-	// );
-
-	FHitResult HitResult;
-	TArray<FVector> OutPathPositions;
-	FVector LastTraceDestination;
-	const TArray<AActor*> ActorsToIgnore;
-
-	UGameplayStatics::Blueprint_PredictProjectilePath_ByTraceChannel(
-		this,
-		HitResult,
-		OutPathPositions,
-		LastTraceDestination,
-		GetActorLocation(),
-		GetVelocity(),
-		true,
-		10,
-		ECollisionChannel::ECC_WorldDynamic,
-		true,
-		ActorsToIgnore,
-		EDrawDebugTrace::ForOneFrame,
-		1
-		);
-	
-	DrawDebugLine(
-		GetWorld(),
-		GetActorLocation(),
-		Target->GetActorLocation(),
-		FColor::Red,
-		false
-	);
-
-	// UE_LOG(LogTemp, Warning, TEXT("Velocity: %s"), *GetVelocity().ToString());
-
-	// UE_LOG(LogTemp, Warning, TEXT("%s"), *BallTarget->GetActorLocation().ToString());
+	//
+	//
+	//
+	//
+	// // UE_LOG(LogTemp, Warning, TEXT("Velocity: %s"), *GetVelocity().ToString());
+	//
+	// UE_LOG(LogTemp, Warning, TEXT("%f"), PathResult.PathData.Last(0).Time);
 
 }
 
@@ -125,6 +131,7 @@ void ABall::ApplyImpulse(FVector TossVelocity)
 	StaticMesh->PutAllRigidBodiesToSleep();
 	StaticMesh->SetConstraintMode(EDOFMode::None);
 	StaticMesh->AddImpulse(TossVelocity * StaticMesh->GetMass());
+	TimeTillFloor(TossVelocity);
 }
 
 void ABall::SetForSpike(ACharacter* Targeted)
@@ -155,6 +162,44 @@ void ABall::SetForSpike(ACharacter* Targeted)
 		StaticMesh->AddImpulse(TossVelocity * 10);
 	}
 	
+}
+
+void ABall::TimeTillFloor(FVector TossVelocity)
+{
+	FPredictProjectilePathParams PathParams = FPredictProjectilePathParams {
+		10,
+		GetActorLocation(),
+		TossVelocity,
+		2,
+	};
+
+	TArray<AActor*> ActorsToIgnore;
+	
+	ActorsToIgnore.Add(this);
+
+	PathParams.bTraceWithCollision = true;
+	PathParams.TraceChannel = ECC_Camera;
+	PathParams.ActorsToIgnore = ActorsToIgnore;
+	
+
+	FPredictProjectilePathResult PathResult;
+
+	
+	UGameplayStatics::Blueprint_PredictProjectilePath_Advanced(this, PathParams, PathResult);
+
+	FVector FloorEnd = PathResult.PathData.Last(0).Location;
+	
+	DrawDebugSphere(
+		GetWorld(),
+		FloorEnd,
+		50,
+		1,
+		FColor::Cyan,
+		false
+	);
+	
+
+	UE_LOG(LogTemp, Warning, TEXT("Time till floor: %f"), PathResult.PathData.Last(0).Time);
 }
 
 void ABall::SetUsingSuggestProjectileVelocity()
