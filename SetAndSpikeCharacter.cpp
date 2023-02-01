@@ -291,7 +291,7 @@ void ASetAndSpikeCharacter::CalculateTossLocation()
 
 	FVector TossLine = SetFromPointProjection - ActorProjection;
 
-	FVector UnrotatedTossLocation = (SetDistanceMultiplier * TossLine) + SetFromPointProjection;
+	FVector UnrotatedTossLocation = (SetDistanceMultiplier  * TossLine) + SetFromPointProjection;
 
 	FVector Radius = FVector(0, FVector::Distance(ActorProjection, UnrotatedTossLocation) , 0);
 
@@ -425,7 +425,7 @@ void ASetAndSpikeCharacter::TestMouseY(float Rate)
 {
 	if (SetDistanceMultiplier - Rate > 0)
 	{
-		SetDistanceMultiplier = SetDistanceMultiplier - Rate * UGameplayStatics::GetWorldDeltaSeconds(this);
+		SetDistanceMultiplier = SetDistanceMultiplier - Rate * UGameplayStatics::GetWorldDeltaSeconds(this) * SetDistanceSensitivity;
 	}
 	
 	

@@ -100,7 +100,7 @@ protected:
 	float ActionQualityPercent = 0.f;
 
 	UPROPERTY(EditAnywhere, Category = "Gameplay")
-	float SetDistanceSensitivity = 1000.f;
+	float SetDistanceSensitivity = 10.f;
 
 	float SetDistanceMultiplier = 2.f;
 
