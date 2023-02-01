@@ -4,6 +4,7 @@
 
 #include "DrawDebugHelpers.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
+#include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -52,8 +53,10 @@ ASetAndSpikeCharacter::ASetAndSpikeCharacter()
 
 	SetFromPoint = CreateDefaultSubobject<USceneComponent>(TEXT("Set From Point"));
 	SetFromPoint->SetupAttachment(GetMesh());
-	
 
+	ActionQualityDisplay = CreateDefaultSubobject<UWidgetComponent>(TEXT("ActionQualityDisplay"));
+	ActionQualityDisplay->SetupAttachment(RootComponent);
+	
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
@@ -67,6 +70,9 @@ void ASetAndSpikeCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	check(PlayerInputComponent);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
+
+	PlayerInputComponent->BindAction("FillBar", IE_Pressed, this, &ASetAndSpikeCharacter::StartFillBar);
+	PlayerInputComponent->BindAction("FillBar", IE_Released, this, &ASetAndSpikeCharacter::ResetBar);
 
 	PlayerInputComponent->BindAction("Set", IE_Pressed, this, &ASetAndSpikeCharacter::Set);
 	PlayerInputComponent->BindAction("Spike", IE_Pressed, this, &ASetAndSpikeCharacter::SpikeBall);
@@ -102,9 +108,17 @@ void ASetAndSpikeCharacter::Tick(float DeltaSeconds)
 
 	if(bAdvanceSetting)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ASDASDASDASDASDASD"));
 		AdvanceSetting();
 	}
+
+	if(bFillBar)
+	{
+		FillBar();
+	}
+
+	// UE_LOG(LogTemp, Warning, TEXT("%s"), *ActionQualityDisplay->GetComponentLocation().ToString());
+
+
 	
 	
 	
@@ -115,6 +129,16 @@ void ASetAndSpikeCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	bAdvanceSetting = true;
+
+	if (ActionQualityDisplay)
+	{
+		ActionQuality = Cast<UActionQuality>(ActionQualityDisplay->GetUserWidgetObject());
+		if(ActionQuality)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Got Progress bar"));
+		}
+	}
+	
 	
 	if(PracticePartner)
 	{
@@ -373,6 +397,27 @@ void ASetAndSpikeCharacter::AdvanceSetting()
 	DrawTossLocation();
 
 	DrawSetTrajectory();
+}
+
+void ASetAndSpikeCharacter::FillBar()
+{
+	if (ActionQualityPercent < 0.99)
+	{
+		ActionQuality->SetActionQualityBarPercent(ActionQualityPercent);
+		ActionQualityPercent += 0.05;
+	}
+}
+
+void ASetAndSpikeCharacter::StartFillBar()
+{
+	bFillBar = true;
+}
+
+void ASetAndSpikeCharacter::ResetBar()
+{
+	bFillBar = false;
+	ActionQualityPercent = 0;
+	ActionQuality->SetActionQualityBarPercent(ActionQualityPercent);
 }
 
 

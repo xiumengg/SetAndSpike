@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ActionQuality.h"
 #include "GameFramework/Character.h"
 #include "Ball.h"
 #include "PracticePartner.h"
+#include "Components/WidgetComponent.h"
 #include "Engine/StaticMeshActor.h"
 #include "SetAndSpikeCharacter.generated.h"
 
@@ -85,8 +87,17 @@ protected:
 
 	void AdvanceSetting();
 
+	void FillBar();
+
+	void StartFillBar();
+
+	void ResetBar();
+
 	bool bAdvanceSetting = true;
 
+	bool bFillBar = false;
+	
+	float ActionQualityPercent = 0.f;
 
 	UPROPERTY(EditAnywhere, Category = "Gameplay")
 	float SetDistanceSensitivity = 1000.f;
@@ -114,6 +125,15 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "Gameplay", meta = (AllowPrivateAccess = "true"))
 	AStaticMeshActor* Floor;
+
+	// UPROPERTY(EditAnywhere)
+	// TSubclassOf<UActionQuality> ActionQualityClass;
+	//
+	UPROPERTY(EditAnywhere, Category="UX")
+	UWidgetComponent* ActionQualityDisplay;
+	
+	UActionQuality* ActionQuality = nullptr;
+
 
 	FPlane FloorPlane;
 
