@@ -401,7 +401,7 @@ void ASetAndSpikeCharacter::AdvanceSetting()
 
 void ASetAndSpikeCharacter::FillBar()
 {
-	if (ActionQualityPercent < 0.99)
+	if (ActionQualityPercent < 1.05)
 	{
 		ActionQuality->SetActionQualityBarPercent(ActionQualityPercent);
 		ActionQualityPercent += 0.05;
@@ -410,6 +410,13 @@ void ASetAndSpikeCharacter::FillBar()
 
 void ASetAndSpikeCharacter::StartFillBar()
 {
+	FVector FloorEnd;
+	float TimeLeft;
+	
+	if(Ball->CanSetBall(this, FloorEnd, TimeLeft))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Greed is good"));
+	}
 	bFillBar = true;
 }
 

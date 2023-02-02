@@ -24,6 +24,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	bool CanSetBall(ACharacter* Setter, FVector &FloorEnd, float &TimeLeft);
+
 	void InitiateSet(ACharacter* Target);
 
 	void Stop();
@@ -34,7 +36,10 @@ public:
 
 	void SetForSpike(ACharacter* Targeted);
 
-	void TimeTillFloor(FVector TossVelocity);
+	void TimeTillFloor(FVector TossVelocity, FVector &FloorEnd, float &TimeLeft);
+
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 private:
 
@@ -45,6 +50,8 @@ private:
 	ACharacter* Target;
 	
 	bool bBeingSet = false;
+
+	bool bCanInteractWithBall = false;
 
 	void SetUsingSuggestProjectileVelocity();
 
