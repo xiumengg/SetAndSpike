@@ -74,7 +74,7 @@ void ASetAndSpikeCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	PlayerInputComponent->BindAction("FillBar", IE_Pressed, this, &ASetAndSpikeCharacter::StartFillBar);
 	PlayerInputComponent->BindAction("FillBar", IE_Released, this, &ASetAndSpikeCharacter::ResetBar);
 
-	PlayerInputComponent->BindAction("Set", IE_Pressed, this, &ASetAndSpikeCharacter::Set);
+	PlayerInputComponent->BindAction("Set", IE_Pressed, this, &ASetAndSpikeCharacter::AdvanceSet);
 	PlayerInputComponent->BindAction("Spike", IE_Pressed, this, &ASetAndSpikeCharacter::SpikeBall);
 
 	PlayerInputComponent->BindAxis("MoveForward", this, &ASetAndSpikeCharacter::MoveForward);
@@ -113,15 +113,14 @@ void ASetAndSpikeCharacter::Tick(float DeltaSeconds)
 
 	if(bFillBar)
 	{
-		FillBar();
+		FillBar(DeltaSeconds);
 	}
 
-	// UE_LOG(LogTemp, Warning, TEXT("%s"), *ActionQualityDisplay->GetComponentLocation().ToString());
+	FVector RandVector = UKismetMathLibrary::RandomUnitVectorInConeInDegrees(FVector::UpVector, 3.14);
 
+	
 
-	
-	
-	
+	UE_LOG(LogTemp, Warning, TEXT("Random Vector is: %s"), *RandVector.ToString());
 }
 
 void ASetAndSpikeCharacter::BeginPlay()
@@ -211,7 +210,7 @@ void ASetAndSpikeCharacter::MoveRight(float Value)
 	}
 }
 
-void ASetAndSpikeCharacter::Set()
+void ASetAndSpikeCharacter::AdvanceSet()
 {
 	FVector TossVelocity;
 	
@@ -226,6 +225,13 @@ void ASetAndSpikeCharacter::Set()
 	
 	Ball->SetActorLocation(SetFromPoint->GetComponentLocation());
 	Ball->ApplyImpulse(TossVelocity);
+}
+
+void ASetAndSpikeCharacter::NormalSet()
+{
+	Ball->InitiateSet(PracticePartner);
+
+	
 }
 
 void ASetAndSpikeCharacter::SpikeBall()
@@ -399,32 +405,46 @@ void ASetAndSpikeCharacter::AdvanceSetting()
 	DrawSetTrajectory();
 }
 
-void ASetAndSpikeCharacter::FillBar()
+void ASetAndSpikeCharacter::FillBar(float DeltaSeconds)
 {
-	if (ActionQualityPercent < 1.05)
+	ActionQualityPercent += (DeltaSeconds/TimeLeft);
+	if (ActionQualityPercent > 1)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Noob"));
+		ResetBar();
+	}
+	else
 	{
 		ActionQuality->SetActionQualityBarPercent(ActionQualityPercent);
-		ActionQualityPercent += 0.05;
 	}
 }
 
 void ASetAndSpikeCharacter::StartFillBar()
 {
 	FVector FloorEnd;
-	float TimeLeft;
 	
 	if(Ball->CanSetBall(this, FloorEnd, TimeLeft))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Greed is good"));
+		// UE_LOG(LogTemp, Warning, TEXT("Greed is good"));
+		bFillBar = true;
 	}
-	bFillBar = true;
+	
 }
 
 void ASetAndSpikeCharacter::ResetBar()
 {
-	bFillBar = false;
-	ActionQualityPercent = 0;
-	ActionQuality->SetActionQualityBarPercent(ActionQualityPercent);
+	if(bFillBar)
+	{
+		bFillBar = false;
+		UE_LOG(LogTemp, Warning, TEXT("Set Quality: %f"), ActionQualityPercent);
+		if(ActionQualityPercent < 1.00)
+		{
+			NormalSet();
+		}
+		ActionQualityPercent = 0;
+		ActionQuality->SetActionQualityBarPercent(ActionQualityPercent);
+	}
+	
 }
 
 

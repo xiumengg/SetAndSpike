@@ -55,10 +55,7 @@ void ABall::InitiateSet(ACharacter* Targeted)
 {
 	Target = Targeted;
 	StaticMesh->PutAllRigidBodiesToSleep();
-	// StaticMesh->SetConstraintMode(EDOFMode::Default);
 	StaticMesh->SetConstraintMode(EDOFMode::None);
-	// StaticMesh->AddImpulse(GetVelocity() * -1 * StaticMesh->GetMass());
-	UE_LOG(LogTemp, Warning, TEXT("Velocity: %s"), *GetVelocity().ToString());
 	SetUsingSuggestProjectileVelocity();
 }
 
@@ -135,7 +132,7 @@ void ABall::TimeTillFloor(FVector TossVelocity, FVector &FloorEnd, float &TimeLe
 	ActorsToIgnore.Add(this);
 
 	PathParams.bTraceWithCollision = true;
-	PathParams.TraceChannel = ECC_Camera;
+	PathParams.TraceChannel = ECC_PhysicsBody;
 	PathParams.ActorsToIgnore = ActorsToIgnore;
 	
 
@@ -152,7 +149,7 @@ void ABall::TimeTillFloor(FVector TossVelocity, FVector &FloorEnd, float &TimeLe
 		50,
 		1,
 		FColor::Cyan,
-		false
+		true
 	);
 	
 
@@ -167,6 +164,11 @@ void ABall::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveCo
 	if(OtherActor->GetName() == "Floor")
 	{
 		bCanInteractWithBall = false;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("I hit %s"), *OtherActor->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("I hit component %s"), *OtherComp->GetName());
 	}
 	
 }
@@ -186,12 +188,9 @@ void ABall::SetUsingSuggestProjectileVelocity()
 	);
 
 	bBeingSet = true;
-
-	FVector SetDirection = Target->GetActorLocation() - GetActorLocation();
 	
-	UE_LOG(LogTemp, Warning, TEXT("Impulse: %s"), *(SetDirection * 10).ToString());
 
-	StaticMesh->AddImpulse(TossVelocity * 10);
+	StaticMesh->AddImpulse(TossVelocity * StaticMesh->GetMass());
 
 	
 }

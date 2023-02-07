@@ -69,7 +69,9 @@ protected:
 	/** Handler for when a touch input stops. */
 	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
 
-	void Set();
+	void AdvanceSet();
+
+	void NormalSet();
 
 	void SpikeBall();
 
@@ -87,7 +89,7 @@ protected:
 
 	void AdvanceSetting();
 
-	void FillBar();
+	void FillBar(float DeltaSeconds);
 
 	void StartFillBar();
 
@@ -98,6 +100,9 @@ protected:
 	bool bFillBar = false;
 	
 	float ActionQualityPercent = 0.f;
+
+	float TimeLeft;
+	
 
 	UPROPERTY(EditAnywhere, Category = "Gameplay")
 	float SetDistanceSensitivity = 10.f;
